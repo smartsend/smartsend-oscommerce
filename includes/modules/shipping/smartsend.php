@@ -56,9 +56,14 @@
             $post_param_values["TOSUBURB"]              = $tosuburb;
             $post_param_values["RECEIPTEDDELIVERY"]     = MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY;
             $post_param_values["TRANSPORTASSURANCE"]    = MODULE_SHIPPING_SMARTSEND_TRANSPORTASSURANCE;
+            $post_param_values["TAILLIFT"]              = "0";
 
+            
+                /*
+                 * CODE HERE FOR TAILLIFT 
+                 */
 
-
+            
             # POST ITEMS VALUE
             foreach($order->products as $key => $data){
                 $i = intval($data['id']);
@@ -178,6 +183,7 @@
         '(Optional) The user type making the quote request. Used in conjunction with USERCODE if appropriate. Valid values are , ebay, corporate, promotion.', 
         '66', '0', now())");
 
+    /*
     # TRANSPORTASSURANCE
     tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
         values ('TRANSPORT ASSURANCE', 'MODULE_SHIPPING_SMARTSEND_TRANSPORTASSURANCE', '0.00', 
@@ -189,7 +195,10 @@
         values ('TAIL LIFT', 'MODULE_SHIPPING_SMARTSEND_TAILLIFT', '0', 
         '(Optional) Specifies whether a tail lift service is required. Acceptable values are None, AtPickup, AtDestination, Both', 
         '66', '0', 'tep_get_tail_class_title', 'tep_cfg_pull_down_tail_classes(',  now())");
-                
+    
+     * 
+     */
+    
     # RECEIPTEDDELIVERY
     tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
         values ('RECEIPTED DELIVERY', 'MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY', '', 
@@ -294,21 +303,21 @@
         '<span style=\'color:red\'>(Required)</span> State of the pickup location (use abbreviation e.g. NSW) ', 
         '66', '0', now())");
 
-
-    # PICKUP STATE   
+/*
+    # PICKUP DATE   
      $desc_date = mysql_real_escape_string('<span style=\'color:red\'>(Required)</span> Sets the pickup date. (format dd/mm/yyyy. e.g. 25/07/2010)');    
      tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
         values ('PICKUP DATE', 'MODULE_SHIPPING_SMARTSEND_PICKUPDATE', '', 
         '{$desc_date}', 
         '66', '0', now())");
      
-    # TAILLIFT
+    # PICKUP TIME
     tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order,use_function, set_function,  date_added) 
         values ('PICKUPTIME', 'MODULE_SHIPPING_SMARTSEND_PICKUPTIME', '0', 
         '<span style=\'color:red\'>(Required)</span> Sets the pickup time window. Valid values are 1 (between 12pm and 4pm) and 2 (between 1pm and 5pm). ', 
         '66', '0', 'tep_get_picktime_class_title', 'tep_cfg_pull_down_picktime_classes(',  now())");
     
-    
+  */  
     
     
   
@@ -335,6 +344,28 @@
         'MODULE_SHIPPING_SMARTSEND_STATUS', 
         'MODULE_SHIPPING_SMARTSEND_USERCODE',
         'MODULE_SHIPPING_SMARTSEND_USERTYPE',
+        'MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY',
+        'MODULE_SHIPPING_SMARTSEND_COUNTRYCODE',
+        'MODULE_SHIPPING_SMARTSEND_POSTCODE',
+        'MODULE_SHIPPING_SMARTSEND_SUBURB',
+        'MODULE_SHIPPING_SMARTSEND_CONTACTCOMPANY',
+        'MODULE_SHIPPING_SMARTSEND_CONTACTNAME',
+        'MODULE_SHIPPING_SMARTSEND_CONTACTPHONE',        
+        'MODULE_SHIPPING_SMARTSEND_CONTACTEMAIL',
+        'MODULE_SHIPPING_SMARTSEND_PICKUPCONTACT',
+        'MODULE_SHIPPING_SMARTSEND_PICKUPCOMPANY',
+        'MODULE_SHIPPING_SMARTSEND_PICKUPADDRESS1',
+        'MODULE_SHIPPING_SMARTSEND_PICKUPADDRESS2',                    
+        'MODULE_SHIPPING_SMARTSEND_PICKUPPHONE',
+        'MODULE_SHIPPING_SMARTSEND_PICKUPSUBURB',
+        'MODULE_SHIPPING_SMARTSEND_PICKUPPOSTCODE',
+        'MODULE_SHIPPING_SMARTSEND_PICKUPSTATE');    
+
+    /*
+    return array(
+        'MODULE_SHIPPING_SMARTSEND_STATUS', 
+        'MODULE_SHIPPING_SMARTSEND_USERCODE',
+        'MODULE_SHIPPING_SMARTSEND_USERTYPE',
         'MODULE_SHIPPING_SMARTSEND_TRANSPORTASSURANCE',
         'MODULE_SHIPPING_SMARTSEND_TAILLIFT',
         'MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY',
@@ -355,8 +386,11 @@
         'MODULE_SHIPPING_SMARTSEND_PICKUPSTATE',
         'MODULE_SHIPPING_SMARTSEND_PICKUPDATE',
         'MODULE_SHIPPING_SMARTSEND_PICKUPTIME');    
+        
+     */
     
     }
+    
   }
   
   
