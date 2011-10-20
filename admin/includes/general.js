@@ -87,6 +87,8 @@ function chkWeight(){
 function validateIt(height, length, depth){
 	weight = $("input[name='products_weight']");
 	description = $("select[name='description']")
+	var TailLift = $("select[name='TailLift']").val();
+	
 	if (!description.val() || description.val().length==0){
 		description.validationEngine('showPrompt','please select a package description','error','topRight',true);
 		return false;
@@ -104,7 +106,7 @@ function validateIt(height, length, depth){
 		return false;
 	}
 	
-	else if (weight.val()>80){
+	else if (weight.val()>80 && !(TailLift == 2 || TailLift == 3)){
 		weight.validationEngine('showPrompt',"Individual items over 80kgs require a 'Tail-Lift Truck' service to be added at the pickup and/or delivery address, otherwise drivers may refuse to pickup and/or deliver the goods, resulting in additional charges to you. A 'Tail-Lift Truck' pickup is optionable if you have a forklift available to help load the goods. However a 'Tail-Lift Truck' delivery service is mandatory and can be added to the quoting process from the options listed here",'error','topRight',true);
 		return false;
 	}
@@ -153,6 +155,8 @@ if(window.location.href.indexOf("action=new_product")!=-1){
 			insertProd("Depth");
 			$("input[name='products_weight']").closest("tr").before('<tr><td class="main">Packaging Method:</td><td class="main"><img src="images/pixel_trans.gif" border="0" alt="" width="24" height="15"> <select name="description" id="description_1" class="descriptionselect validate[funcCall[checkFurniture]]" maxweight="17" maxlength="400" maxheight="400" maxwidth="400"><option value=""></option><option selected="selected" value="0" maxweight="1">Envelope</option><option value="2" secondperson="35" maxweight="80" maxweight_msg="Please strap the carton/box to a SKID or PALLET and choose the correct description from the drop down list. You should also consider adding a \'Tail-Lift Truck\' service to your booking to ensure there are no issues with pickup or delivery.">Carton</option><option value="3" maxweight="17" maxweight_msg="Please select Heavy Carton.">Satchel/Bag</option><option maxweight="17" value="4">Tube</option><option value="5" maxweight="1000" secondperson="35" forklift="80">Skid</option><option value="6" maxweight="1000" secondperson="35" forklift="80">Pallet</option><option value="7" maxweight="1000" secondperson="35" forklift="80">Crate</option><option value="8" maxweight="80" secondperson="35" forklift="80" maxweight_msg="Please strap the Pack to a SKID or PALLET and choose the correct description from the drop down list. You should also consider adding a \'Tail-Lift Truck\' service to your booking to ensure there are no issues with pickup or delivery.">Flat Pack</option><option value="9" maxweight="80" secondperson="35" maxweight_msg="Rolls over 35kgs require a 2nd person to help the driver load and unload the goods. Pickup will be refused by driver otherwise">Roll</option><option value="10" maxweight="80" secondperson="35" forklift="80" maxweight_msg="Please strap the LENGTH to a SKID or PALLET and choose the correct description from the drop down list. You should also consider adding a \'Tail-Lift Truck\' service to your booking to ensure there are no issues with pickup or delivery.">Length</option><option value="12" maxweight="80" secondperson="35" maxweight_msg="TYRES/WHEELS over 80kgs should be strapped to a SKID or PALLET and then choose the correct description from the drop down list. You should also consider adding a \'Tail-Lift Truck\' service to your booking to ensure there are no issues with pickup or delivery.">Tyre/Wheel</option><option value="13">Furniture/Bedding</option></select></td></tr>')	
 			
+			newDataElement.append('<tr><td class="main">Do you require a "Tail-Lift Truck"<br>to help load or unload the goods? </td><td class="main"><img src="images/pixel_trans.gif" border="0" alt="" width="24" height="15"> <select id="TailLift" name="TailLift"><option value="0">No</option><option value="1">Yes - At Pickup</option><option value="2">Yes - At Delivery</option><option value="3">Yes - At Pickup and Delivery</option></select></td></tr>')	
+			
 			buttonContainer=$("button#tdb1").parent();
 			buttonElement=buttonContainer.html();
 			$("button#tdb1").remove();
@@ -172,6 +176,7 @@ if(window.location.href.indexOf("action=new_product")!=-1){
 						aLength=$("input[name='products_length']");
 						aDepth=$("input[name='products_depth']");
 						desc=$("select[name='description']").val();
+						tailLift=$("select[name='TailLift']").val();
 						
 						var ItemTypeMap = {
 							0 : "envelope",
@@ -191,8 +196,14 @@ if(window.location.href.indexOf("action=new_product")!=-1){
 							13 : "bedding"
 						}[desc];
 						
+						var TailLiftTypeID = { 
+							0 : "none", 
+							1 : "atpickup", 
+							2 : "atdestination", 
+							3 : "both"}[tailLift.toLowerCase()];
+						
 						if(validateIt(aHeight,aLength,aDepth) && chkWeight()){
-							$.post("addcustomfields.php", { height: aHeight.val(), length: aLength.val(), depth: aDepth.val(), action: "edit", pID: apID, description : ItemTypeMap},
+							$.post("addcustomfields.php", { height: aHeight.val(), length: aLength.val(), depth: aDepth.val(), action: "edit", pID: apID, description : ItemTypeMap, taillift: TailLiftTypeID},
 							function(data) {
 								window.location.href="categories.php";
 							});
@@ -206,6 +217,7 @@ if(window.location.href.indexOf("action=new_product")!=-1){
 						aLength = $("input[name='products_length']");
 						aDepth = $("input[name='products_depth']");
 						desc=$("select[name='description']").val();
+						tailLift=$("select[name='TailLift']").val();
 						
 						var ItemTypeMap = {
 							0 : "envelope",
@@ -224,6 +236,12 @@ if(window.location.href.indexOf("action=new_product")!=-1){
 							13 : "furniture", 
 							13 : "bedding"
 						}[desc];
+						
+						var TailLiftTypeID = { 
+							0 : "none", 
+							1 : "atpickup", 
+							2 : "atdestination", 
+							3 : "both"}[tailLift.toLowerCase()];
 						
 						if(validateIt(aHeight,aLength,aDepth) && chkWeight()){
 							$.post("addcustomfields.php", { height: aHeight.val(), length: aLength.val(), depth: aDepth.val(), action: "add", description : ItemTypeMap },

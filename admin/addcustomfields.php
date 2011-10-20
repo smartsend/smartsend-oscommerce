@@ -17,7 +17,9 @@
 		$length=$_POST["length"];
 		$height=$_POST["height"];
 		$desc=$_POST["description"];
-		mysql_query("INSERT INTO smartsend_products (description, id, depth, length, height) VALUES('$desc', '$next_id', '$depth', '$length', '$height') ") or die(mysql_error());
+		$taillift=$_POST["taillift"];
+		
+		mysql_query("INSERT INTO smartsend_products (description, id, depth, length, height, taillift) VALUES('$desc', '$next_id', '$depth', '$length', '$height','$taillift') ") or die(mysql_error());
 		}
 
 		if($_POST["action"]=="edit"){
@@ -25,12 +27,13 @@
 			$length=$_POST["length"];
 			$height=$_POST["height"];
 			$desc=$_POST["description"];
+			$taillift=$_POST["taillift"];
 			$pID=$_POST["pID"];
-			$update = mysql_query("UPDATE smartsend_products SET depth = '$depth', length = '$length', height='$height', description='$desc' WHERE id='$pID'") 
+			$update = mysql_query("UPDATE smartsend_products SET depth = '$depth', length = '$length', height='$height', description='$desc', taillift='$taillift' WHERE id='$pID'") 
 			or die(mysql_error()); 
 			echo mysql_affected_rows();
 			if(mysql_affected_rows()==0){
-				mysql_query("INSERT INTO smartsend_products (description, id, depth, length, height) VALUES('$desc', '$pID', '$depth', '$length', '$height') ") or die(mysql_error());
+				mysql_query("INSERT INTO smartsend_products (description, id, depth, length, height, taillift) VALUES('$desc', '$pID', '$depth', '$length', '$height', '$taillift') ") or die(mysql_error());
 			}
 		}
 		
@@ -45,6 +48,7 @@
 			$length = $row["length"];
 			$depth = $row["depth"];
 			$desc = $row["description"];
+			$taillift = $row["taillift"];
 			
 			echo '$("input[name=\'products_height\']").val("'.$height.'");';
 			echo '$("input[name=\'products_length\']").val("'.$length.'");';
@@ -68,7 +72,14 @@
 					"furniture" : 13, 
 					"bedding" : 13
 				}[desc];
-				$("select[name=\'description\'] option[value=\'"+ItemTypeMap+"\']").attr("selected", true)
+				$("select[name=\'description\'] option[value=\'"+ItemTypeMap+"\']").attr("selected", true);
+				var tl="'.$taillift.'";
+				var TailLiftTypeID = { 
+				"none" : 0, 
+				"atpickup" : 1, 
+				"atdestination" : 2, 
+				"both" : 3}[tl.toLowerCase()];
+				$("select[name=\'TailLift\'] option[value=\'"+TailLiftTypeID+"\']").attr("selected", true);
 			';
 			
 		}
