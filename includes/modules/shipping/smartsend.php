@@ -220,6 +220,13 @@
      */
     
     # RECEIPTEDDELIVERY
+    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order,use_function, set_function,  date_added) 
+        values ('RECEIPTED DELIVERY', 'MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY', '0', 
+        '(Optional) Yes / No  that specifies whether or not recipient is required to sign for the consignment', 
+        '66', '0', 'tep_get_rdelivery_class_title', 'tep_cfg_pull_down_rdelivery_classes(',  now())");
+    
+    
+    # RECEIPTEDDELIVERY
     tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
         values ('RECEIPTED DELIVERY', 'MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY', '', 
         '(Optional) Boolean flag (true/false) that specifies whether or not recipient is required to sign for the consignment', 
@@ -559,4 +566,38 @@
     }
     
   }  
+  
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <new func> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Name  : RECEIPTED DELIVERY
+ * Desc  : set the PICKUP TIME value in admin
+ * Found : 'admin->shipping module'
+ * 
+ * How to access the value : just call 'MODULE_SHIPPING_SMARTSEND_TAILLIFT'
+ */
+
+  # Set array RECEIPTED DELIVERY
+  function tep_arr_rdelivery(){
+    $ptime[] = Array ("id" =>  "true" ,"text" => "YES");
+    $ptime[] = Array ("id" =>  "false","text" => "NO");
+    return $ptime;
+  }
+  
+  # Set func RECEIPTED DELIVERY
+  function tep_cfg_pull_down_rdelivery_classes($id, $key = '') {
+    $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
+    return tep_draw_pull_down_menu($name, tep_arr_rdelivery() , $id);      
+  }    
+  
+  # Use func RECEIPTED DELIVERY
+  function tep_get_rdelivery_class_title($id) {
+    $ptime = tep_arr_rdelivery();
+    foreach($ptime as $val){
+        if($val["id"] == $id){
+          return $val['text'];      
+        }
+    }
+    
+  }  
+  
+  
 ?>
