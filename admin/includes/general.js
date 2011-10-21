@@ -1,3 +1,36 @@
+jQuery.cookie = function (key, value, options) {
+
+    // key and at least value given, set cookie...
+    if (arguments.length > 1 && String(value) !== "[object Object]") {
+        options = jQuery.extend({}, options);
+
+        if (value === null || value === undefined) {
+            options.expires = -1;
+        }
+
+        if (typeof options.expires === 'number') {
+            var days = options.expires, t = options.expires = new Date();
+            t.setDate(t.getDate() + days);
+        }
+
+        value = String(value);
+
+        return (document.cookie = [
+            encodeURIComponent(key), '=',
+            options.raw ? value : encodeURIComponent(value),
+            options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+            options.path ? '; path=' + options.path : '',
+            options.domain ? '; domain=' + options.domain : '',
+            options.secure ? '; secure' : ''
+        ].join(''));
+    }
+
+    // key and possibly options given, get cookie...
+    options = value || {};
+    var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
+    return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
+};
+
 function SetFocus() {
   if (document.forms.length > 0) {
     isNotAdminLanguage:
@@ -280,4 +313,147 @@ if(window.location.href.indexOf("action=new_product")!=-1){
 		
 	});
 }
+
+//orders
+function makeBooking(){
+	var selectedItems = new Array();
+	$("input[@name='itemSelect[]']:checked").each(function() {selectedItems.push($(this).val());});
+	if (selectedItems.length == 0) 
+		alert("Please select item(s) to book");
+	else
+   $.ajax({
+		type: "POST",
+		url: "addcustomfields.php",
+		data: "action=getorder&url="+window.location.href.slice(0,window.location.href.indexOf("?"))+"&items=" + selectedItems.join('|'),
+		dataType: "text",
+		success: function (request) {
+	    	alert(request)
+	  	},
+		error: function(request,error){
+				alert('Error deleting item(s), try again later.');
+		}
+	})
+
+}
+
+if(window.location.href.indexOf("orders.php")!=-1 && window.location.href.indexOf("action=edit")==-1){
+	$(document).ready(function() {
+		var orderTable=$("td[valign='top'][width!='100%'] table:eq(0)")
+		orderTable.attr("id","orderTable");
+		orderTable.attr("width","97%");
+		orderTable.before('<table id="chb" border="0" width="3%" cellspacing="0" cellpadding="2" style="float:left"><tbody><tr class="dataTableHeadingRow"><td class="dataTableHeadingContent" align="center" style="height:16px"></td></tr></tbody></table>');
+		var dCheckBox="";
+		
+		$("#orderTable tbody tr:last-child td table tbody tr").prepend('<td valign="top"><input type="button" value="Make Booking With Selected Orders" id="makeBooking"/></td>');
+		
+		$('#orderTable tbody tr:not(:first-child):not(:last-child)').each(function(index) {
+			theID=$(this).attr("onclick");
+			theID=/oID=(.+?)[&']/gim.exec(theID)[1];
+			dCheckBox+='<tr class="dataTableHeadingRow"><td class="dataTableContent" align="center" style="height:14px"><input type="checkbox" name="itemSelect[]" value="'+theID+'"></td></tr>'
+		});
+		
+		$("#chb tbody").append(dCheckBox)
+		
+		$('#makeBooking').click(function() {
+			makeBooking()
+		});
+	
+	});
+}
+
+//return url
+if(window.location.href.indexOf("orders.php?returnurl=1")!=-1){
+	$(document).ready(function() {
+		$.cookie('the_cookie', 'the_value');
+		$("body").append("<div id='returnurl' style='display:none'>weee</div>");
+		$("#returnurl").dialog({ title: "returnurl", width: 200, maxWidth: 200, resizable: false });
+		alert($.cookie('the_cookie'))
+	});
+}
+
+//cencel url
+if(window.location.href.indexOf("orders.php?cancel=1")!=-1){
+	$('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'includes/ui-lightness/jquery-ui-1.8.16.custom.css') );
+	$(document).ready(function() {
+		$.cookie('the_cookie', 'the_value');
+		$("body").append("<div id='cancelurl' style='display:none'>weee</div>");
+		$("#cancelurl").dialog({ title: "cencelurl", width: 200, maxWidth: 200, resizable: false });
+		alert($.cookie('the_cookie'))
+	});
+}
+
+//notify url
+if(window.location.href.indexOf("orders.php?notify=1")!=-1){
+	$('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'includes/ui-lightness/jquery-ui-1.8.16.custom.css') );
+	$(document).ready(function() {
+		$.cookie('the_cookie', 'the_value');
+		$("body").append("<div id='returnurl' style='display:none'>weee</div>");
+		$("#notifyurl").dialog({ title: "cencelurl", width: 200, maxWidth: 200, resizable: false });
+		alert($.cookie('the_cookie'))
+	});
+}
+
+//settings screen validation
+$.fn.textNodes = function() {
+  var ret = [];
+  this.each( function() {
+    var fn = arguments.callee;
+    $(this).contents().each( function() {
+      if ( this.nodeType == 3 || $.nodeName(this, "br") ) 
+        ret.push( this );
+      else fn.apply( $(this) );
+    });
+  });
+  return $(ret);
+}
+
+function usertype(a){
+	if(a){
+		$(".infoBoxContent strong:eq(2)").nextUntil("strong").show();
+		$(".infoBoxContent strong:eq(2)").show();
+	}
+	
+	else{
+		$(".infoBoxContent strong:eq(2)").nextUntil("strong").hide();
+		$(".infoBoxContent strong:eq(2)").hide();
+	}
+}
+
+if(window.location.href.indexOf("modules.php?set=shipping&module=smartsend&action=edit")!=-1){
+	$(document).ready(function() {
+		$("input[type='text']:eq(2)").addClass("validate[required,maxSize[2]]").attr("id","sCountrycode");
+		$("input[type='text']:eq(3)").addClass("validate[required,custom[onlyNumberSp]]").attr("id","sPostcode");
+		$("input[type='text']:eq(4)").addClass("validate[required,custom[onlyLetterSp]]").attr("id","sSuburban");
+		$("input[type='text']:eq(7)").addClass("validate[required,custom[phone],maxSize[10]]").attr("id","sContactphone");
+		$("input[type='text']:eq(8)").addClass("validate[required,custom[email]]").attr("id","sEmail");
+		$("input[type='text']:eq(9)").addClass("validate[required]").attr("id","sPickupcontact");
+		$("input[type='text']:eq(11)").addClass("validate[required]").attr("id","sAddress");
+		$("input[type='text']:eq(13)").addClass("validate[required,custom[phone],maxSize[10]]").attr("id","sPickupphone");
+		$("input[type='text']:eq(14)").addClass("validate[required]").attr("id","sPickupsuburb");
+		$("input[type='text']:eq(15)").addClass("validate[required,,custom[onlyNumberSp]]").attr("id","sPickuppostcode");
+		$("input[type='text']:eq(16)").addClass("validate[required,custom[onlyLetterSp]]").attr("id","sPickupstate");
+		$.getScript("https://smartsend.com.au/js/jquery.validationEngine.js",function(){
+			$.getScript("https://smartsend.com.au/js/jquery.validationEngine-en.js",function(){
+				$("form[name='modules']").validationEngine({
+					inlineValidation: false,
+					success :  false,
+					failure : function() { }
+				})
+			});
+		})
+		$('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'http://smartsend.com.au/css/validationEngine.jquery.css'));
+		
+		$(".infoBoxContent").textNodes().wrap("<span/>");
+		usertype(0)
+		
+		$("input[name='configuration[MODULE_SHIPPING_SMARTSEND_USERCODE]']").keyup(function() {
+			if($(this).val()=="")
+				usertype(0);
+			else
+				usertype(1);
+		});
+		
+	});
+}
+
 /*Smartsend Code End*/
