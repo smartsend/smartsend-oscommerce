@@ -327,10 +327,35 @@ function makeBooking(){
 		data: "action=getorder&url="+window.location.href.slice(0,window.location.href.indexOf("?"))+"&items=" + selectedItems.join('|'),
 		dataType: "text",
 		success: function (request) {
-	    	alert(request)
+			alert(request)
+			request=request.split("&");
+			var ERROR = new Array();
+			for(l=0;l<request.length;l++){
+				if(request[l].slice(0,request[l].indexOf("=")).search(/\(/)!=-1){
+					request[l]=request[l].replace(/\(/,"[").replace(/\)/,"]")
+				}
+				request[l]=request[l].replace("=","=\"");
+				request[l]=request[l]+"\"";
+				eval(request[l])
+			}
+			if(ACK=="SUCCESS"){
+				$.cookie('token', TOKEN);
+				$.cookie('items', items);
+				$.cookie('dobookingURL', post_url+"?METHOD=DOBOOKING&TOKEN="+TOKEN);
+				window.location.href=BOOKINGURL;
+			}
+			else{
+				var theError="";
+				for(o=0;o<ERROR.length;o++){
+					theError+="<div style='background: #CADEFF; border:1px solid #AECBFF; margin-bottom: 2px; padding: 2px; color: #333; font-weight:bold'>"+unescape(ERROR[o])+"</div>";
+				}
+				$("body").append("<div id='smartsendErrors' style='display:none'>"+theError+"</div>");
+				$("#smartsendErrors").dialog({ title: "there are "+ERROR.length+" error/s regarding your booking/s", width: 400, maxWidth: 200, resizable: false });
+			}
+			
 	  	},
 		error: function(request,error){
-				alert('Error deleting item(s), try again later.');
+				
 		}
 	})
 
@@ -361,13 +386,32 @@ if(window.location.href.indexOf("orders.php")!=-1 && window.location.href.indexO
 	});
 }
 
+function SAF(a){
+	if($('.saf'+a).html()=="")
+		$('.saf'+a).load('orders.php?page=1&oID='+a+'&action=edit table:eq(4), table:eq(8)', function() {});
+	else
+		$('.saf'+a).html("")
+}
+
+function doBooking(){
+	
+}
+
 //return url
 if(window.location.href.indexOf("orders.php?returnurl=1")!=-1){
 	$(document).ready(function() {
-		$.cookie('the_cookie', 'the_value');
-		$("body").append("<div id='returnurl' style='display:none'>weee</div>");
-		$("#returnurl").dialog({ title: "returnurl", width: 200, maxWidth: 200, resizable: false });
-		alert($.cookie('the_cookie'))
+		$("body").append("<div id='returnurl' style='display:none'></div>");
+		var theItems = $.cookie('items').split("|");
+
+		for(i=0;i<theItems.length;i++){
+
+			//$('#returnurl #sAccordion').load('orders.php?page=1&oID='+theItems[i]+'&action=edit table:eq(8)', function() {});
+			$("#returnurl").append("<h3 style='background: #b3bac5; padding: 2px; cursor: pointer' onClick='SAF("+theItems[i]+");return false;'><a href='#'>Order #"+theItems[i]+"</a></h3><div class='saf"+theItems[i]+"' style='padding-left: 5px; padding-right: 5px'></div>")
+		}
+		
+		$("#returnurl").append("<hr /><div align='right'><img src='http://ppcalc.com/buttons/x-click-but6.gif' onClick='doBooking()' style='cursor: pointer'/></div>")
+		
+		$("#returnurl").dialog({ title: "Receipt", width: 700, maxWidth: 700, resizable: false, open: function(event, ui) {}});
 	});
 }
 
@@ -378,7 +422,6 @@ if(window.location.href.indexOf("orders.php?cancel=1")!=-1){
 		$.cookie('the_cookie', 'the_value');
 		$("body").append("<div id='cancelurl' style='display:none'>weee</div>");
 		$("#cancelurl").dialog({ title: "cencelurl", width: 200, maxWidth: 200, resizable: false });
-		alert($.cookie('the_cookie'))
 	});
 }
 
@@ -389,7 +432,6 @@ if(window.location.href.indexOf("orders.php?notify=1")!=-1){
 		$.cookie('the_cookie', 'the_value');
 		$("body").append("<div id='returnurl' style='display:none'>weee</div>");
 		$("#notifyurl").dialog({ title: "cencelurl", width: 200, maxWidth: 200, resizable: false });
-		alert($.cookie('the_cookie'))
 	});
 }
 
