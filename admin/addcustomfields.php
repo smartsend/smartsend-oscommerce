@@ -33,7 +33,8 @@
 			$post_param_values["RETURNURL"] = $_POST["url"]."?returnurl=1";
 			$post_param_values["CANCELURL"] = $_POST["url"]."?cancelurl=1";
 			$post_param_values["NOTIFYURL"] = $_POST["url"]."?notifyurl=1";
-
+			
+			$post_url = "http://api.dev.smartsend.com.au/";
 			$bookingCount=0;
 			foreach($items as $item){
 				$itemCount=0;
@@ -50,7 +51,6 @@
 				$post_param_values["BOOKING({$bookingCount})_CONTACTNAME"] = getConfig("MODULE_SHIPPING_SMARTSEND_CONTACTNAME");
 				$post_param_values["BOOKING({$bookingCount})_CONTACTPHONE"] = getConfig("MODULE_SHIPPING_SMARTSEND_CONTACTPHONE");
 				$post_param_values["BOOKING({$bookingCount})_CONTACTEMAIL"] = getConfig("MODULE_SHIPPING_SMARTSEND_CONTACTEMAIL");
-				$post_param_values["BOOKING({$bookingCount})_CONTACTEMAIL"] = getConfig("MODULE_SHIPPING_SMARTSEND_CONTACTEMAIL");
 				
 				$post_param_values["BOOKING({$bookingCount})_PICKUPCOMPANY"] = getConfig("MODULE_SHIPPING_SMARTSEND_PICKUPCOMPANY");
 				$post_param_values["BOOKING({$bookingCount})_PICKUPCONTACT"] = getConfig("MODULE_SHIPPING_SMARTSEND_PICKUPCONTACT");
@@ -60,6 +60,7 @@
 				$post_param_values["BOOKING({$bookingCount})_PICKUPSUBURB"] = getConfig("MODULE_SHIPPING_SMARTSEND_PICKUPSUBURB");
 				$post_param_values["BOOKING({$bookingCount})_PICKUPPOSTCODE"] = getConfig("MODULE_SHIPPING_SMARTSEND_PICKUPPOSTCODE");
 				$post_param_values["BOOKING({$bookingCount})_PICKUPSTATE"] = getConfig("MODULE_SHIPPING_SMARTSEND_PICKUPSTATE");
+				$post_param_values["BOOKING({$bookingCount})_RECEIPTEDDELIVERY"] = getConfig("MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY");
 
 				
 				$post_param_values["BOOKING({$bookingCount})_DESTCOMPANY"] = $customerInfos["customers_company"];
@@ -146,26 +147,24 @@
 				if( $value!="" )
 				$post_string .= "$key=" . urlencode( $value ) . "&";
 			}
+			//$post_string .= "BOOKING(0)_PICKUPDATE=25/12/2011&BOOKING(0)_PICKUPTIME=2& ";
 			$post_string = rtrim( $post_string, "& " );
 			
-			
-			
-			
+			//echo $post_string;
 			# START CURL PROCESS
 			
-			$post_url = "http://api.dev.smartsend.com.au/";
-			/*$request = curl_init($post_url); 
+			$request = curl_init($post_url); 
 			curl_setopt($request, CURLOPT_HEADER, 0); 
 			curl_setopt($request, CURLOPT_RETURNTRANSFER, 1); 
 			curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
 			curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
 			$post_response = curl_exec($request); 
-			curl_close ($request); // close curl object */
+			curl_close ($request); // close curl object   *
 			//var_dump($post_response);
 			
-			//echo $post_url."?".$post_string."&items=".$_POST["items"];
+			//echo $post_url."?".$post_string;
 			echo $post_response;
-			echo "ACK=SUCCESS&TOKEN=ejfklj453589&BOOKINGURL=http://www.google.com&ERROR(0)=Error%20Message%201&ERROR(1)=Error%20Message%202"."&items=".$_POST["items"]."&post_url=$post_url";
+			//echo "ACK=FAILED&TOKEN=ejfklj453589&BOOKINGURL=http://www.google.com&ERROR(0)=Error%20Message%201&ERROR(1)=Error%20Message%202";
 		}
 		
 		if($_POST["action"]=="add"){
