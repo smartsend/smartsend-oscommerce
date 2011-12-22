@@ -364,7 +364,7 @@
     }
 
     function remove() {
-      tep_db_query("delete from " . TABLE_CONFIGURATION . " where configuration_key in ('" . implode("', '", $this->keys()) . "')");
+      tep_db_query("delete from " . TABLE_CONFIGURATION . " where configuration_key LIKE '%smartsend%'");
     }
 
     function keys() {
