@@ -338,10 +338,10 @@ function makeBooking(){
 				request[l]=request[l]+"\"";
 				eval(request[l])
 			}
-			if(ACK=="SUCCESS"){
-				$.cookie('token', TOKEN);
-				$.cookie('items', items);
+			if(ACK=="Success"){
+				$.cookie('token', Token);
 				$.cookie('dobookingURL', post_url+"?METHOD=DOBOOKING&TOKEN="+TOKEN);
+				BOOKINGURL=unescape(BOOKINGURL)
 				window.location.href=BOOKINGURL;
 			}
 			else{
@@ -449,7 +449,7 @@ $.fn.textNodes = function() {
   return $(ret);
 }
 
-function usertype(a){
+/*function usertype(a){
 	if(a){
 		$(".infoBoxContent strong:eq(2)").nextUntil("strong").show();
 		$(".infoBoxContent strong:eq(2)").show();
@@ -459,7 +459,7 @@ function usertype(a){
 		$(".infoBoxContent strong:eq(2)").nextUntil("strong").hide();
 		$(".infoBoxContent strong:eq(2)").hide();
 	}
-}
+}*/
 
 if(window.location.href.indexOf("modules.php?set=shipping&module=smartsend&action=edit")!=-1){
 	$(document).ready(function() {
@@ -485,15 +485,15 @@ if(window.location.href.indexOf("modules.php?set=shipping&module=smartsend&actio
 		})
 		$('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'http://smartsend.com.au/css/validationEngine.jquery.css'));
 		
-		$(".infoBoxContent").textNodes().wrap("<span/>");
-		usertype(0)
+		/*$(".infoBoxContent").textNodes().wrap("<span/>");
+		usertype(0)*/
 		
-		$("input[name='configuration[MODULE_SHIPPING_SMARTSEND_USERCODE]']").keyup(function() {
+		/*$("input[name='configuration[MODULE_SHIPPING_SMARTSEND_USERCODE]']").keyup(function() {
 			if($(this).val()=="")
 				usertype(0);
 			else
 				usertype(1);
-		});
+		});*/
 		
 	});
 }
