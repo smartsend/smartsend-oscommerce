@@ -42,7 +42,7 @@
                 $tosuburb       = $order->delivery['city'];
             }
 
-            $post_url = "http://api.smartsend.com.au/";
+            $post_url = "https://api.dev.smartsend.com.au/";
 
 
             # POST PARAMETER VALUES

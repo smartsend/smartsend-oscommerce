@@ -1,4 +1,4 @@
-jQuery.cookie = function (key, value, options) {
+﻿jQuery.cookie = function (key, value, options) {
 
     // key and at least value given, set cookie...
     if (arguments.length > 1 && String(value) !== "[object Object]") {
@@ -339,8 +339,8 @@ function makeBooking(){
 				eval(request[l])
 			}
 			if(ACK=="Success"){
-				$.cookie('token', Token);
-				$.cookie('dobookingURL', post_url+"?METHOD=DOBOOKING&TOKEN="+TOKEN);
+				//$.cookie('token', Token);
+				//$.cookie('dobookingURL', post_url+"?METHOD=DOBOOKING&TOKEN="+TOKEN);
 				BOOKINGURL=unescape(BOOKINGURL)
 				window.location.href=BOOKINGURL;
 			}
