@@ -34,7 +34,7 @@
 			$post_param_values["CANCELURL"] = $_POST["url"]."?cancelurl=1";
 			$post_param_values["NOTIFYURL"] = $_POST["url"]."?notifyurl=1";
 			
-			$post_url = "https://api.dev.smartsend.com.au/";
+			$post_url = "https://api.smartsend.com.au/";
 			$bookingCount=0;
 			foreach($items as $item){
 				$itemCount=0;
@@ -82,7 +82,7 @@
 				$result = tep_db_query("SELECT products_quantity, products_id FROM orders_products WHERE orders_id={$item}");
 				while($row = mysql_fetch_array($result)){
 					
-					$result2 = tep_db_query("SELECT products.products_id AS products_id, smartsend_products.description AS description, smartsend_products.depth AS depth, smartsend_products.height AS height, smartsend_products.length AS length, smartsend_products.taillift AS taillift FROM products, smartsend_products WHERE smartsend_products.id={$row['products_id']} AND products.products_id={$row['products_id']}");
+					$result2 = tep_db_query("SELECT products.products_weight AS products_weight, smartsend_products.description AS description, smartsend_products.depth AS depth, smartsend_products.height AS height, smartsend_products.length AS length, smartsend_products.taillift AS taillift FROM products, smartsend_products WHERE smartsend_products.id={$row['products_id']} AND products.products_id={$row['products_id']}");
 					//item loop
 					
 					while($row2 = mysql_fetch_array($result2)){
@@ -91,7 +91,7 @@
 							$post_value_items["BOOKING({$bookingCount})_ITEM($itemCount)_DEPTH"] = $row2["depth"];
 							$post_value_items["BOOKING({$bookingCount})_ITEM($itemCount)_HEIGHT"] = $row2["height"];
 							$post_value_items["BOOKING({$bookingCount})_ITEM($itemCount)_LENGTH"] = $row2["length"];
-							$post_value_items["BOOKING({$bookingCount})_ITEM($itemCount)_WEIGHT"] = $row2["products_id"];
+							$post_value_items["BOOKING({$bookingCount})_ITEM($itemCount)_WEIGHT"] = $row2["products_weight"];
 							
 							if($row2["taillift"]=="none")
 								$tl_none=1;
