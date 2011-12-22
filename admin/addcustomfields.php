@@ -162,8 +162,8 @@
 			curl_close ($request); // close curl object   *
 			//var_dump($post_response);
 			
-			//echo $post_url."?".$post_string;
-			echo $post_response;
+			echo $post_url."?".$post_string;
+			//echo $post_response;
 			//echo "ACK=FAILED&TOKEN=ejfklj453589&BOOKINGURL=http://www.google.com&ERROR(0)=Error%20Message%201&ERROR(1)=Error%20Message%202";
 		}
 		
