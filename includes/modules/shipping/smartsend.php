@@ -42,26 +42,26 @@
                 $tosuburb       = $order->delivery['city'];
             }
 
-            $post_url = "https://api.dev.smartsend.com.au/";
+            $post_url = "https://api.smartsend.com.au/";
 
 
             # POST PARAMETER VALUES
 
             $post_param_values["METHOD"]                = "GetQuote";
-            $post_param_values["FROMCOUNTRYCODE"]       = "AU";
-            $post_param_values["FROMPOSTCODE"]          = "2000";
-            $post_param_values["FROMSUBURB"]            = "SYDNEY";
+            $post_param_values["FROMCOUNTRYCODE"]       = MODULE_SHIPPING_SMARTSEND_COUNTRYCODE;
+            $post_param_values["FROMPOSTCODE"]          = MODULE_SHIPPING_SMARTSEND_POSTCODE;
+            $post_param_values["FROMSUBURB"]            = MODULE_SHIPPING_SMARTSEND_SUBURB;
             $post_param_values["TOCOUNTRYCODE"]         = $tocountrycode;
             $post_param_values["TOPOSTCODE"]            = $topostcode;
             $post_param_values["TOSUBURB"]              = $tosuburb;
             $post_param_values["RECEIPTEDDELIVERY"]     = MODULE_SHIPPING_SMARTSEND_RECEIPTEDDELIVERY;
             $post_param_values["TRANSPORTASSURANCE"]    = $order->info["total"];
             
-            
 
             # tail lift - init    
             $taillift = array();
-            
+            $has_valid_products_info = true;
+			
             # POST ITEMS VALUE
             foreach($order->products as $key => $data){
                 $i = intval($data['id']);
@@ -69,13 +69,14 @@
                 $products = tep_db_query("SELECT depth,length,height,description,taillift FROM smartsend_products WHERE id={$i}");    
                                 
                 $products = mysql_fetch_assoc($products);
-                    
+                
+				if(!$products) $has_valid_products_info = false; // if record null or false;
                                                                  
-                $post_value_items["ITEM({$key})_HEIGHT"]         =  $products['height'];
-                $post_value_items["ITEM({$key})_LENGTH"]         =  $products['length'];
-                $post_value_items["ITEM({$key})_DEPTH"]          =  $products['depth'];
-                $post_value_items["ITEM({$key})_WEIGHT"]         =  $data['weight'];
-                $post_value_items["ITEM({$key})_DESCRIPTION"]    =  $products['description'];
+                $post_value_items["ITEM({$key})_HEIGHT"]         =  $products['height'] ? $products['height'] : 0 ;
+                $post_value_items["ITEM({$key})_LENGTH"]         =  $products['length'] ? $products['length'] : 0 ;
+                $post_value_items["ITEM({$key})_DEPTH"]          =  $products['depth'] ? $products['depth'] : 0 ;
+                $post_value_items["ITEM({$key})_WEIGHT"]         =  $data['weight']  ? $data['weight'] : 0 ;
+                $post_value_items["ITEM({$key})_DESCRIPTION"]    =  $products['description'] ? $products['description'] : 'envelope' ;
                 
                 
                     # tail lift - assigns value
@@ -91,6 +92,10 @@
                     }
             }
             
+			# Check if valid info from smartsend_products table
+			if(!$has_valid_products_info) return false; // false if has no record response from smartsend_products (products are not configured length,depth,height)
+			
+			
             # tail lift - choose appropriate value
             $post_param_values["TAILLIFT"] = "none";            
             if (in_array("none",  $taillift))                                               $post_param_values["TAILLIFT"]      = "none";           
@@ -101,6 +106,8 @@
             
             
             $post_final_values = array_merge($post_param_values,$post_value_items);
+			
+			
 
             # POST PARAMETER AND ITEMS VALUE URLENCODE
             $post_string = "";
@@ -108,10 +115,9 @@
                     { $post_string .= "$key=" . urlencode( $value ) . "&"; }
             $post_string = rtrim( $post_string, "& " );
 
-           //echo $post_url."?".$post_string;
-
-            /*
+            
             # START CURL PROCESS
+						
             $request = curl_init($post_url); 
             curl_setopt($request, CURLOPT_HEADER, 0); 
             curl_setopt($request, CURLOPT_RETURNTRANSFER, 1); 
@@ -119,14 +125,13 @@
             curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
             $post_response = curl_exec($request); 
             curl_close ($request); // close curl object    
-            var_dump($post_response);
-            */
+
+
 
             # test response
-            $str_resp = "ACK=Success&QUOTE(0)_TOTAL=26.47&QUOTE(0)_SERVICE=Road&QUOTE(0)_ESTIMATEDTRANSITTIME=1-2%20business%20days&QUOTE(0)_ESTIMATEDTRANSITTIME_MINDAYS=1&QUOTE(0)_ESTIMATEDTRANSITTIME_MAXDAYS=1&QUOTE(1)_TOTAL=102.92&QUOTE(1)_SERVICE=Overnight&QUOTE(1)_ESTIMATEDTRANSITTIME=Next%20business%20day&QUOTE(1)_ESTIMATEDTRANSITTIME_MINDAYS=1&QUOTE(1)_ESTIMATEDTRANSITTIME_MAXDAYS=1&QUOTE(2)_TOTAL=150.15&QUOTE(2)_SERVICE=Overnight%20by%209am&QUOTE(2)_ESTIMATEDTRANSITTIME=Next%20business%20day%20delivered%20by%209am&QUOTE(2)_ESTIMATEDTRANSITTIME_MINDAYS=1&QUOTE(2)_ESTIMATEDTRANSITTIME_MAXDAYS=1&QUOTECOUNT=3";
 
             # parse output
-            parse_str($str_resp, $arr_resp);
+            parse_str($post_response, $arr_resp);
 
             $quote_count = ((int) $arr_resp["QUOTECOUNT"]) - 1;
 
